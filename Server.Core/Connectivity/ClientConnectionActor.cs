@@ -56,10 +56,7 @@
             var stream = this.client.GetStream();
             reader = new StreamReader(stream);
             writer = new StreamWriter(stream) {AutoFlush = true};
-            Receive<OperationError>(msg =>
-                                    {
-                                        msg.ExceptionDispatchInfo.Throw();
-                                    });
+            Receive<OperationError>(msg => msg.ExceptionDispatchInfo.Throw());
             Become(Anonymous);
         }
 
@@ -140,12 +137,7 @@
             {
                 if (client.Connected)
                 {
-                    reader
-                        .ReadLineAsync()
-                        .MapAsync(
-                            line =>
-                                new UnauthenticatedClientRequest(
-                                    JsonConvert.DeserializeObject<Request>(line)))
+                    reader.ReadLineAsync().MapAsync(line => new UnauthenticatedClientRequest(JsonConvert.DeserializeObject<Request>(line)))
                         .PipeTo(Self, Self);
                 }
                 else
@@ -155,80 +147,78 @@
             });
 
             Receive<UnauthenticatedClientRequest>(msg =>
-                                                  {
-                                                      var req = msg.Request;
+            {
+                var req = msg.Request;
 
-                                                      switch (req.RequestType)
-                                                      {
-                                                          case RequestType.Login:
-                                                          case RequestType.CreateAccount:
-                                                              clients.Ask<AccountAuthenticationStatus>(
-                                                                  new IsAuthenticated(req.ToTyped<AccountInfo>(),
-                                                                      req.RequestType)).PipeTo(Self, Self);
-                                                              break;
-                                                          default:
-                                                              SendResponse(new Response
-                                                              {
-                                                                  ResponseType = ResponseType.InvalidCommand,
-                                                                  Payload =
-                                                                      "Invalid command - client has to be authenticated first via login or account creation"
-                                                              });
-                                                              accountName = null;
-                                                              Become(Anonymous);
-                                                              Self.Tell(new AuthenticateConnection());
-                                                              break;
-                                                      }
-                                                  });
+                switch (req.RequestType)
+                {
+                    case RequestType.Login:
+                    case RequestType.CreateAccount:
+                        clients.Ask<AccountAuthenticationStatus>(new IsAuthenticated(req.ToTyped<Account>(), req.RequestType)).PipeTo(Self, Self);
+                        break;
+                    default:
+                        SendResponse(new Response
+                        {
+                            ResponseType = ResponseType.InvalidCommand,
+                            Payload =
+                                "Invalid command - client has to be authenticated first via login or account creation"
+                        });
+                        accountName = null;
+                        Become(Anonymous);
+                        Self.Tell(new AuthenticateConnection());
+                        break;
+                }
+            });
 
             Receive<AccountAuthenticationStatus>(msg =>
-                                                 {
-                                                     switch (msg.Status)
-                                                     {
-                                                         case AuthenticationStatus.Authenticated:
-                                                             SendResponse(new Response
-                                                             {
-                                                                 ResponseType = ResponseType.AuthenticationFailure,
-                                                                 Payload = "Account " + msg.AccountInfo.AccountName + " is already connected and authenticated."
-                                                             });
-                                                             Stop();
-                                                             return;
-                                                         case AuthenticationStatus.NotAuthenticated:
-                                                             switch (msg.RequestType)
-                                                             {
-                                                                 case RequestType.Login:
-                                                                     accountVerification.Tell(msg.AccountInfo, Self);
-                                                                     break;
-                                                                 case
-                                                                     RequestType.CreateAccount:
-                                                                     accountCreation.Tell(msg.AccountInfo, Self);
-                                                                     break;
-                                                             }
-                                                             return;
-                                                     }
-                                                 });
+            {
+                switch (msg.Status)
+                {
+                    case AuthenticationStatus.Authenticated:
+                        SendResponse(new Response
+                        {
+                            ResponseType = ResponseType.AuthenticationFailure,
+                            Payload = "Account " + msg.AccountInfo.AccountName + " is already connected and authenticated."
+                        });
+                        Stop();
+                        return;
+                    case AuthenticationStatus.NotAuthenticated:
+                        switch (msg.RequestType)
+                        {
+                            case RequestType.Login:
+                                accountVerification.Tell(msg.AccountInfo, Self);
+                                break;
+                            case
+                                RequestType.CreateAccount:
+                                accountCreation.Tell(msg.AccountInfo, Self);
+                                break;
+                        }
+                        return;
+                }
+            });
 
             Receive<AuthenticationSuccessful>(msg =>
-                                             {
-                                                 SendResponse(new Response
-                                                 {
-                                                     ResponseType = ResponseType.ConnectionAccepted
-                                                 });
-                                                 accountName = msg.AccountName;
-                                                 Become(Authenticated);
-                                                 clients.Tell(new AddClient(msg.AccountName));
-                                                 Self.Tell(new WaitForCommand());
-                                             });
+            {
+                SendResponse(new Response
+                {
+                    ResponseType = ResponseType.ConnectionAccepted
+                });
+                accountName = msg.AccountName;
+                Become(Authenticated);
+                clients.Tell(new AddClient(msg.AccountName));
+                Self.Tell(new WaitForCommand());
+            });
             Receive<AuthenticationFailed>(msg =>
-                                          {
-                                              SendResponse(new Response
-                                              {
-                                                  ResponseType = ResponseType.AuthenticationFailure,
-                                                  Payload = msg.Message
-                                              });
-                                              accountName = null;
-                                              Become(Anonymous);
-                                              Self.Tell(new AuthenticateConnection());
-                                          });
+            {
+                SendResponse(new Response
+                {
+                    ResponseType = ResponseType.AuthenticationFailure,
+                    Payload = msg.Message
+                });
+                accountName = null;
+                Become(Anonymous);
+                Self.Tell(new AuthenticateConnection());
+            });
         }
     }
 }

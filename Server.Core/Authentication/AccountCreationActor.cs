@@ -7,15 +7,15 @@
     {
         public AccountCreationActor()
         {
-            Receive<AccountInfo>(msg =>
-                                 {
-                                     if (msg.AccountName.Length > 20)
-                                     {
-                                         Sender.Tell(new AuthenticationFailed("Account name is too long."), Self);
-                                     }
-                                     // TODO: Create account
-                                     Sender.Tell(new AuthenticationSuccessful(msg.AccountName), Self);
-                                 });
+            Receive<Account>(msg =>
+            {
+                if (msg.AccountName.Length > 20)
+                {
+                    Sender.Tell(new AuthenticationFailed("Account name is too long."), Self);
+                }
+                // TODO: Create account
+                Sender.Tell(new AuthenticationSuccessful(msg.AccountName), Self);
+            });
         }
     }
 }

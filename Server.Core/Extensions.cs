@@ -33,66 +33,66 @@
             where TTarget : IOperationResult
         {
             return task.ContinueWith<IOperationResult>(result =>
-                                                            {
-                                                                if (result.IsCanceled || result.IsFaulted)
-                                                                {
-                                                                    return new OperationError(result.Exception);
-                                                                }
+                    {
+                        if (result.IsCanceled || result.IsFaulted)
+                        {
+                            return new OperationError(result.Exception);
+                        }
 
-                                                                try
-                                                                {
-                                                                    return mapper(result.Result);
-                                                                }
-                                                                catch (Exception ex)
-                                                                {
-                                                                    return new OperationError(ex);
-                                                                }
-                                                            });
+                        try
+                        {
+                            return mapper(result.Result);
+                        }
+                        catch (Exception ex)
+                        {
+                            return new OperationError(ex);
+                        }
+                    });
         }
 
         public static Task<IOperationResult> ExecuteAsync(this Task task, Action action = null)
         {
             return task.ContinueWith<IOperationResult>(result =>
-                                                            {
-                                                                if (result.IsCanceled || result.IsFaulted)
-                                                                {
-                                                                    return new OperationError(result.Exception);
-                                                                }
+                    {
+                        if (result.IsCanceled || result.IsFaulted)
+                        {
+                            return new OperationError(result.Exception);
+                        }
 
-                                                                try
-                                                                {
-                                                                    if (action != null)
-                                                                    {
-                                                                        action();
-                                                                    }
-                                                                    return OperationResult.Empty;
-                                                                }
-                                                                catch (Exception ex)
-                                                                {
-                                                                    return new OperationError(ex);
-                                                                }
-                                                            });
+                        try
+                        {
+                            if (action != null)
+                            {
+                                action();
+                            }
+                            return OperationResult.Empty;
+                        }
+                        catch (Exception ex)
+                        {
+                            return new OperationError(ex);
+                        }
+                    });
         }
 
         public static Task<IOperationResult> MapAsync<T>(this Task task, Func<T> func)
             where T : IOperationResult
         {
             return task.ContinueWith<IOperationResult>(result =>
-                                                            {
-                                                                if (result.IsCanceled || result.IsFaulted)
-                                                                {
-                                                                    return new OperationError(result.Exception);
-                                                                }
+                    {
+                        if (result.IsCanceled || result.IsFaulted)
+                        {
+                            return new OperationError(result.Exception);
+                        }
 
-                                                                try
-                                                                {
-                                                                    return func();
-                                                                }
-                                                                catch (Exception ex)
-                                                                {
-                                                                    return new OperationError(ex);
-                                                                }
-                                                            });
+                        try
+                        {
+                            return func();
+                        }
+                        catch (Exception ex)
+                        {
+                            return new OperationError(ex);
+                        }
+                    });
         }
     }
 }

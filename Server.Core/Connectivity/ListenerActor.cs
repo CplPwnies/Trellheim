@@ -23,19 +23,17 @@
             listener = new TcpListener(endpoint);
 
             Receive<IncomingConnection>(connection =>
-                                        {
-                                            var client = connection.Client;
-                                            if (client.Connected)
-                                            {
-                                                Context.System
-                                                    .ActorOf(Props.Create(() => new ClientConnectionActor(client), new OneForOneStrategy(_ => Directive.Stop))) // Always stop on failure. The client will have to reconnect.
-                                                    .Tell(new AuthenticateConnection());
-                                            }
-                                            AcceptConnection();
-                                        });
+            {
+                var client = connection.Client;
+                if (client.Connected)
+                {
+                    Context.System.ActorOf(Props.Create(() => new ClientConnectionActor(client), new OneForOneStrategy(_ => Directive.Stop))) // Always stop on failure. The client will have to reconnect.
+                        .Tell(new AuthenticateConnection());
+                }
+                AcceptConnection();
+            });
 
             Receive<OperationError>(error => error.ExceptionDispatchInfo.Throw());
-
             listener.Start();
             AcceptConnection();
         }
@@ -43,14 +41,14 @@
         private void AcceptConnection()
         {
             listener.AcceptTcpClientAsync()
-                    .ContinueWith<IOperationResult>(tcp =>
-                                                {
-                                                    if (tcp.IsFaulted)
-                                                    {
-                                                        return new OperationError(tcp.Exception);
-                                                    }
-                                                    return new IncomingConnection(tcp.Result);
-                                                }).PipeTo(Self);
+            .ContinueWith<IOperationResult>(tcp =>
+            {
+                if (tcp.IsFaulted)
+                {
+                    return new OperationError(tcp.Exception);
+                }
+                return new IncomingConnection(tcp.Result);
+            }).PipeTo(Self);
         }
     }
 }

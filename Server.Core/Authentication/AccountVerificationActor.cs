@@ -7,18 +7,18 @@ namespace Trellheim.Server.Core.Authentication
     {
         public AccountVerificationActor()
         {
-            Receive<AccountInfo>(msg =>
-                                 {
-                                     // TODO: Verify account
-                                     if (msg.AccountName.Length > 12)
-                                     {
-                                         Sender.Tell(new AuthenticationFailed("Account name is too long"));
-                                     }
-                                     else
-                                     {
-                                         Sender.Tell(new AuthenticationSuccessful(msg.AccountName), Self);
-                                     }
-                                 });
+            Receive<Account>(msg =>
+            {
+                // TODO: Verify account
+                if (msg.AccountName.Length > 12)
+                {
+                    Sender.Tell(new AuthenticationFailed("Account name is too long"));
+                }
+                else
+                {
+                    Sender.Tell(new AuthenticationSuccessful(msg.AccountName), Self);
+                }
+            });
         }
     }
 }

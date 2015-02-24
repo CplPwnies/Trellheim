@@ -1,7 +1,8 @@
 ﻿namespace Trellheim.Data.Client
 {
-    public sealed class AccountInfo
+    public sealed class Account
     {
         public string AccountName { get; set; }
+        public string Password { get; set; }
     }
 }

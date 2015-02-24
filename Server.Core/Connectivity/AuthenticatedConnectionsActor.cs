@@ -6,56 +6,46 @@
 
     public sealed class AddClient
     {
-        private readonly string accountName;
+        public string AccountName { get; private set; }
 
         public AddClient(string accountName)
         {
-            this.accountName = accountName;
-        }
-
-        public string AccountName
-        {
-            get { return accountName; }
+            AccountName = accountName;
         }
     }
 
     public sealed class RemoveClient
     {
-        private readonly string accountName;
+        public string AccountName { get; private set; }
 
         public RemoveClient(string accountName)
         {
-            this.accountName = accountName;
-        }
-
-        public string AccountName
-        {
-            get { return accountName; }
-        }
+            AccountName = accountName;
+        }        
     }
 
     public sealed class IsAuthenticated
     {
-        public IsAuthenticated(AccountInfo accountInfo, RequestType requestType)
+        public IsAuthenticated(Account accountInfo, RequestType requestType)
         {
             AccountInfo = accountInfo;
             RequestType = requestType;
         }
 
-        public AccountInfo AccountInfo { get; private set; }
+        public Account AccountInfo { get; private set; }
         public RequestType RequestType { get; private set; }
     }
 
     public sealed class AccountAuthenticationStatus
     {
-        public AccountAuthenticationStatus(AccountInfo accountInfo, RequestType requestType, AuthenticationStatus status)
+        public AccountAuthenticationStatus(Account accountInfo, RequestType requestType, AuthenticationStatus status)
         {
             AccountInfo = accountInfo;
             RequestType = requestType;
             Status = status;
         }
 
-        public AccountInfo AccountInfo { get; private set; }
+        public Account AccountInfo { get; private set; }
         public RequestType RequestType { get; private set; }
         public AuthenticationStatus Status { get; private set; }    
     }
@@ -71,20 +61,17 @@
         private readonly IDictionary<string, ActorRef> authenticatedClients = new Dictionary<string, ActorRef>();
         public AuthenticatedConnectionsActor()
         {
-            Receive<IsAuthenticated>(msg =>
-                                     {
-                                         Sender.Tell(!authenticatedClients.ContainsKey(msg.AccountInfo.AccountName)
-                                             ? new AccountAuthenticationStatus(msg.AccountInfo, msg.RequestType, AuthenticationStatus.NotAuthenticated)
-                                             : new AccountAuthenticationStatus(msg.AccountInfo, msg.RequestType, AuthenticationStatus.Authenticated));
-                                     });
+            Receive<IsAuthenticated>(msg => Sender.Tell(!authenticatedClients.ContainsKey(msg.AccountInfo.AccountName)
+                ? new AccountAuthenticationStatus(msg.AccountInfo, msg.RequestType, AuthenticationStatus.NotAuthenticated)
+                : new AccountAuthenticationStatus(msg.AccountInfo, msg.RequestType, AuthenticationStatus.Authenticated)));
             Receive<AddClient>(msg =>
-                               {
-                                   authenticatedClients[msg.AccountName] = Sender;
-                               });
+            {
+                authenticatedClients[msg.AccountName] = Sender;
+            });
             Receive<RemoveClient>(msg =>
-                                  {
-                                      authenticatedClients.Remove(msg.AccountName);
-                                  });
+            {
+                authenticatedClients.Remove(msg.AccountName);
+            });
         }
     }
 }
