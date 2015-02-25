@@ -5,7 +5,7 @@
     using Akka.Actor;
     using Authentication;
     using Newtonsoft.Json;
-    using Data.Client;
+    using Data.Shared;
     using Request = Data.Client.Request;
     using RequestType = Data.Client.RequestType;
     using Response = Data.Server.Response;

@@ -40,8 +40,7 @@
 
         private void AcceptConnection()
         {
-            listener.AcceptTcpClientAsync()
-            .ContinueWith<IOperationResult>(tcp =>
+            listener.AcceptTcpClientAsync().ContinueWith<IOperationResult>(tcp =>
             {
                 if (tcp.IsFaulted)
                 {

@@ -1,4 +1,4 @@
-﻿namespace Trellheim.Data.Client
+﻿namespace Trellheim.Data.Shared
 {
     public sealed class Account
     {

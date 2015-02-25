@@ -5,7 +5,7 @@
     using System.Data.Common;
     using System.Data.Entity;
     using System.Threading.Tasks;
-    using Data.Client;
+    using Data.Shared;
 
     public interface IEntityContext : IDisposable
     {
@@ -32,6 +32,7 @@
         {
             modelBuilder.HasDefaultSchema("MainGame");
             modelBuilder.Entity<Account>().ToTable("Accounts");
+            modelBuilder.Entity<Character>().ToTable("Characters");
             modelBuilder.Configurations.AddFromAssembly(typeof(IEntityContext).Assembly);
             // You can also override/add conventions here by accessing modelBuilder.Conventions
         }

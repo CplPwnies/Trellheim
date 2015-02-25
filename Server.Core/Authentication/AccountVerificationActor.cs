@@ -1,7 +1,7 @@
 namespace Trellheim.Server.Core.Authentication
 {
     using Akka.Actor;
-    using Data.Client;
+    using Data.Shared;
 
     public sealed class AccountVerificationActor : ReceiveActor
     {

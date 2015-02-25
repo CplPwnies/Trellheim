@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Akka.Actor;
+    using Data.Shared;
     using Data.Client;
 
     public sealed class AddClient

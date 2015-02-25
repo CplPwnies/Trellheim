@@ -41,12 +41,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IMessage.cs" />
-    <Compile Include="Client\AccountInfo.cs" />
+    <Compile Include="Shared\Account.cs" />
     <Compile Include="Client\Request.cs" />
     <Compile Include="Client\RequestType.cs" />
     <Compile Include="Client\Response.cs" />
     <Compile Include="Client\ResponseType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shared\Character.cs" />
     <Compile Include="Server\Request.cs" />
     <Compile Include="Server\RequestType.cs" />
     <Compile Include="Server\Response.cs" />
